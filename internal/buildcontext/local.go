@@ -39,7 +39,7 @@ func PrepareLocalContext(dir string) (*PreparedContext, error) {
 
 	archiveInfo, err := os.Stat(archivePath)
 	if err != nil {
-		os.Remove(archivePath)
+		_ = os.Remove(archivePath)
 		return nil, fmt.Errorf("stat archive: %w", err)
 	}
 

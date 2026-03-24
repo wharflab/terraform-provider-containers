@@ -496,7 +496,7 @@ func (r *buildResource) prepareAndUploadContext(
 
 		contextHash = prepared.Hash
 		contextKey = prefix + "contexts/" + contextHash + ".tar.gz"
-		cleanup = func() { os.Remove(prepared.ArchivePath) }
+		cleanup = func() { _ = os.Remove(prepared.ArchivePath) }
 
 		tflog.Debug(ctx, "uploading context archive", map[string]interface{}{
 			"hash": contextHash,

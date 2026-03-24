@@ -24,10 +24,10 @@ func CreateArchive(dir string, pm *patternmatcher.PatternMatcher) (string, error
 	if err != nil {
 		return "", err
 	}
-	defer tmpFile.Close()
+	defer func() { _ = tmpFile.Close() }()
 
 	if err := writeArchive(tmpFile, dir, pm); err != nil {
-		os.Remove(tmpFile.Name())
+		_ = os.Remove(tmpFile.Name())
 		return "", err
 	}
 
@@ -36,10 +36,10 @@ func CreateArchive(dir string, pm *patternmatcher.PatternMatcher) (string, error
 
 func writeArchive(w io.Writer, dir string, pm *patternmatcher.PatternMatcher) error {
 	gzw := gzip.NewWriter(w)
-	defer gzw.Close()
+	defer func() { _ = gzw.Close() }()
 
 	tw := tar.NewWriter(gzw)
-	defer tw.Close()
+	defer func() { _ = tw.Close() }()
 
 	entries, err := collectEntries(dir, pm)
 	if err != nil {
@@ -141,7 +141,7 @@ func addToArchive(tw *tar.Writer, absPath, relPath string) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	_, err = io.Copy(tw, f)
 	return err

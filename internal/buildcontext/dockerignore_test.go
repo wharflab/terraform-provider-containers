@@ -20,7 +20,9 @@ func TestReadDockerignore_Missing(t *testing.T) {
 func TestReadDockerignore_Parses(t *testing.T) {
 	dir := t.TempDir()
 	content := "# comment\nnode_modules\n\n*.log\n!important.log\n"
-	os.WriteFile(filepath.Join(dir, ".dockerignore"), []byte(content), 0o644)
+	if err := os.WriteFile(filepath.Join(dir, ".dockerignore"), []byte(content), 0o644); err != nil {
+		t.Fatal(err)
+	}
 
 	patterns, err := ReadDockerignore(dir)
 	if err != nil {

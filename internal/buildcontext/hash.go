@@ -33,7 +33,7 @@ func HashDirectory(dir string, pm *patternmatcher.PatternMatcher) (string, error
 		}
 
 		// Hash the relative path and size.
-		fmt.Fprintf(h, "path:%s\nsize:%d\n", relPath, info.Size())
+		_, _ = fmt.Fprintf(h, "path:%s\nsize:%d\n", relPath, info.Size())
 
 		if info.Mode().IsRegular() {
 			if err := hashFileContents(h, absPath); err != nil {
@@ -97,7 +97,7 @@ func hashFileContents(h io.Writer, path string) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	_, err = io.Copy(h, f)
 	return err

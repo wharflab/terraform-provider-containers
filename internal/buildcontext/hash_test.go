@@ -69,7 +69,9 @@ func TestHashDirectory_ChangesOnNewFile(t *testing.T) {
 func TestHashDirectory_IgnoresGitDir(t *testing.T) {
 	dir := t.TempDir()
 	writeFile(t, dir, "file.txt", "hello")
-	os.MkdirAll(filepath.Join(dir, ".git", "objects"), 0o755)
+	if err := os.MkdirAll(filepath.Join(dir, ".git", "objects"), 0o755); err != nil {
+		t.Fatal(err)
+	}
 	writeFile(t, dir, ".git/HEAD", "ref: refs/heads/main\n")
 
 	hash1, err := HashDirectory(dir, nil)
@@ -118,7 +120,9 @@ func TestHashDirectory_RespectsPatternMatcher(t *testing.T) {
 func writeFile(t *testing.T, dir, name, content string) {
 	t.Helper()
 	p := filepath.Join(dir, name)
-	os.MkdirAll(filepath.Dir(p), 0o755)
+	if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+		t.Fatal(err)
+	}
 	if err := os.WriteFile(p, []byte(content), 0o644); err != nil {
 		t.Fatal(err)
 	}

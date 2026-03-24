@@ -82,7 +82,7 @@ func UploadContext(ctx context.Context, client *s3.Client, bucket, key, archiveP
 	if err != nil {
 		return fmt.Errorf("opening archive %q: %w", archivePath, err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	_, err = client.PutObject(ctx, &s3.PutObjectInput{
 		Bucket: aws.String(bucket),
@@ -224,7 +224,7 @@ func ReadResultMetadata(ctx context.Context, client *s3.Client, bucket, key stri
 	if err != nil {
 		return nil, fmt.Errorf("reading result from s3://%s/%s: %w", bucket, key, err)
 	}
-	defer output.Body.Close()
+	defer func() { _ = output.Body.Close() }()
 
 	body, err := io.ReadAll(output.Body)
 	if err != nil {

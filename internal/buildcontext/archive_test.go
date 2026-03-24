@@ -13,20 +13,22 @@ func TestCreateArchive_Deterministic(t *testing.T) {
 	dir := t.TempDir()
 	writeFile(t, dir, "a.txt", "aaa")
 	writeFile(t, dir, "b.txt", "bbb")
-	os.MkdirAll(filepath.Join(dir, "sub"), 0o755)
+	if err := os.MkdirAll(filepath.Join(dir, "sub"), 0o755); err != nil {
+		t.Fatal(err)
+	}
 	writeFile(t, dir, "sub/c.txt", "ccc")
 
 	path1, err := CreateArchive(dir, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.Remove(path1)
+	defer func() { _ = os.Remove(path1) }()
 
 	path2, err := CreateArchive(dir, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.Remove(path2)
+	defer func() { _ = os.Remove(path2) }()
 
 	entries1 := listArchiveEntries(t, path1)
 	entries2 := listArchiveEntries(t, path2)
@@ -51,7 +53,7 @@ func TestCreateArchive_SortedEntries(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.Remove(path)
+	defer func() { _ = os.Remove(path) }()
 
 	entries := listArchiveEntries(t, path)
 	for i := 1; i < len(entries); i++ {
@@ -65,14 +67,16 @@ func TestCreateArchive_SortedEntries(t *testing.T) {
 func TestCreateArchive_ExcludesGit(t *testing.T) {
 	dir := t.TempDir()
 	writeFile(t, dir, "file.txt", "content")
-	os.MkdirAll(filepath.Join(dir, ".git", "objects"), 0o755)
+	if err := os.MkdirAll(filepath.Join(dir, ".git", "objects"), 0o755); err != nil {
+		t.Fatal(err)
+	}
 	writeFile(t, dir, ".git/HEAD", "ref: refs/heads/main\n")
 
 	path, err := CreateArchive(dir, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.Remove(path)
+	defer func() { _ = os.Remove(path) }()
 
 	for _, entry := range listArchiveEntries(t, path) {
 		if entry == ".git" || entry == ".git/HEAD" || entry == ".git/objects" {
@@ -95,7 +99,7 @@ func TestCreateArchive_RespectsIgnorePatterns(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.Remove(path)
+	defer func() { _ = os.Remove(path) }()
 
 	entries := listArchiveEntries(t, path)
 	for _, e := range entries {
@@ -113,19 +117,19 @@ func TestCreateArchive_NormalizedTimestamps(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.Remove(path)
+	defer func() { _ = os.Remove(path) }()
 
 	f, err := os.Open(path)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	gz, err := gzip.NewReader(f)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer gz.Close()
+	defer func() { _ = gz.Close() }()
 
 	tr := tar.NewReader(gz)
 	for {
@@ -148,13 +152,13 @@ func listArchiveEntries(t *testing.T, path string) []string {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	gz, err := gzip.NewReader(f)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer gz.Close()
+	defer func() { _ = gz.Close() }()
 
 	var entries []string
 	tr := tar.NewReader(gz)
