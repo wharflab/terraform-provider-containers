@@ -24,9 +24,21 @@ profile.cov
 go.work
 go.work.sum
 
+# Provider binary
+terraform-provider-containers
+
 # env file
 .env
 
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfplan
+
+# dist
+dist/
