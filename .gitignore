@@ -31,8 +31,11 @@ terraform-provider-containers
 .env
 
 # Editor/IDE
-# .idea/
-# .vscode/
+.idea/
+.vscode/
+
+# Signing keys
+*.pub.asc
 
 # Terraform
 .terraform/
